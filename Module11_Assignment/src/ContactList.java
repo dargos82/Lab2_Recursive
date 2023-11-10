@@ -33,7 +33,7 @@ public class ContactList
       return fileName;
    } //end intro()
    
-   public int userSelection()
+   public int userSelection() //user input to add, delete, or display contacts
    {
       Scanner input = new Scanner(System.in);
       
@@ -56,14 +56,14 @@ public class ContactList
       
    }
    
-   public void display(String fileName) throws IOException
+   public void display(String readFile) throws IOException
    {
       BufferedReader displayList = null;
       String record = null;
       
       try
       {
-         displayList = new BufferedReader( new FileReader( fileName ) );
+         displayList = new BufferedReader( new FileReader( readFile ) );
          
          while( ( record = displayList.readLine() ) !=  null)
             System.out.println( record ); //print data from file
@@ -78,8 +78,10 @@ public class ContactList
    public static void main(String[] args) throws IOException 
    {
       ContactList list = new ContactList();
+      String storedFile = list.intro();
       
-      File file = new File( list.intro() ); //create new File object
+      
+      File file = new File( storedFile ); //create new File object
       
       switch( list.userSelection() )
       {
@@ -88,9 +90,9 @@ public class ContactList
          case 2:
             list.delete();
          case 3:
-            list.display( list.intro().toString() );
-         default:
-            System.out.println( "Invalid response.");
+            list.display( storedFile ); 
+         //default:
+            //System.out.println( "Invalid response.");
       }      
       
       //fileOutput.close();
