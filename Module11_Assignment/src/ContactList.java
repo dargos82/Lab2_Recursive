@@ -6,7 +6,10 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
+import java.util.TreeMap;
 
 
 /** class ContactList opens a file, and can add/delete data to that file, and print
@@ -46,17 +49,78 @@ public class ContactList
       return selection;
    } //end userSelection()
    
-   public void add()
+   public TreeMap loadTreeMap(File file) throws IOException
+   {
+      String[] contactDetails = new String[3];
+      
+      TreeMap<String, String[]> person = new TreeMap<String, String[]>();
+      
+      BufferedReader addContact = null;
+      String record = null;
+      
+      addContact = new BufferedReader( new FileReader( file ) );
+      
+      while( ( record = addContact.readLine() ) !=  null)
+      {
+         String strLastName = record.substring(0, 16);
+         String lastName = strLastName.trim();
+         
+         String strFirstName = record.substring(16, 33);
+         contactDetails[0] = strFirstName.trim();
+         
+         String strPhoneNum = record.substring(33, 54);
+         contactDetails[1] = strPhoneNum.trim();
+         
+         String strEmail = record.substring(54, 80);
+         contactDetails[2] = strEmail.trim();
+         
+         person.put(lastName, contactDetails);
+      } //end while
+      
+      return person;
+      
+   } //end loadTreeMap()
+   
+   public void add( File readFile, TreeMap addNewPerson ) throws IOException
+   {
+      //get user input for new last name, first name, phone, email
+      Scanner input = new Scanner(System.in);
+      String[] newPerson = new String[3];
+      
+      System.out.print( "\nLast Name: ");
+      String newLastName = input.next();
+      System.out.print( "\nFirst Name: ");
+      String newFirstName = input.next();
+      newPerson[0] = newFirstName;
+      System.out.print( "\nPhone Number: ");
+      String newPhoneNum = input.next();
+      newPerson[1] = newPhoneNum;
+      System.out.print( "\nEmail: ");
+      String newEmail = input.next();
+      newPerson[2] = newEmail;
+      
+      addNewPerson.put(newLastName, newPerson);
+
+      //create output file object
+      PrintWriter newContactList = new PrintWriter( new BufferedWriter( new FileWriter( readFile, true) ) );
+      
+      Set<Map.Entry<String, String[]>> newList = addNewPerson.entrySet();
+      
+      for( Map.Entry<String, String[]> printList : newList )
+      {
+         newContactList.printf( "%-15s%-17s%-22s%-26s", printList.getKey(), printList.getValue() );
+      }
+         
+
+      //write to file for storage
+   } //end add()
+   
+   public void delete( File readFile )
    {
       
-   }
+   } //end delete()
    
-   public void delete()
-   {
-      
-   }
-   
-   public void display(String readFile) throws IOException
+   public void display(File readFile) throws IOException
    {
       BufferedReader displayList = null;
       String record = null;
@@ -72,29 +136,29 @@ public class ContactList
       {
          e.printStackTrace();
       }
-   }
+   } //end display()
    
 
    public static void main(String[] args) throws IOException 
    {
       ContactList list = new ContactList();
-      String storedFile = list.intro();
+
+      File file = new File( list.intro() ); //create new File object
       
-      
-      File file = new File( storedFile ); //create new File object
       
       switch( list.userSelection() )
       {
          case 1:
-            list.add();
+            TreeMap addPerson = list.loadTreeMap( file );
+            list.add( file, addPerson );
          case 2:
-            list.delete();
+            list.delete( file );
          case 3:
-            list.display( storedFile ); 
+            list.display( file ); 
          //default:
             //System.out.println( "Invalid response.");
       }      
-      
+ 
       //fileOutput.close();
       
    } //end main()
