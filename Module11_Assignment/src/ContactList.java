@@ -26,6 +26,12 @@ public class ContactList
       DISPLAY
    }
    
+   /** intro() gets the file path and name from the user. 
+    * 
+    * @param input
+    * @return fileName
+    * 
+    */
    public String intro()
    {
       Scanner input = new Scanner(System.in);
@@ -36,6 +42,11 @@ public class ContactList
       return fileName;
    } //end intro()
    
+   /** userSelection() lets user select the operation to be executed. 
+    * 
+    * @param input
+    * @return selection
+    */
    public int userSelection() //user input to add, delete, or display contacts
    {
       Scanner input = new Scanner(System.in);
@@ -49,6 +60,18 @@ public class ContactList
       return selection;
    } //end userSelection()
    
+   /** loadTreeMap() reads a file and loads a TreeMap with the last name (key) and details (value). 
+    * 
+    * @param contactDetails
+    * @param addContact
+    * @param record
+    * @param strLastName
+    * @param lastName
+    * @param strFirstName
+    * @param strPhoneNum
+    * @param strEmail
+    * @return person
+    */
    public TreeMap loadTreeMap(File file) throws IOException
    {
       String[] contactDetails = new String[3];
@@ -81,6 +104,20 @@ public class ContactList
       
    } //end loadTreeMap()
    
+   /** add() gets user input for new contact details and adds the new contact to the TreeMap
+    * then prints the full TreeMap to a file. 
+    * 
+    * @param input
+    * @param newPerson
+    * @param newLastName
+    * @param newFirstName
+    * @param newPhoneNum
+    * @param newEmail
+    * @param addNewPerson
+    * @param newContactList
+    * @param newList
+    * @param printList
+    */
    public void add( File readFile, TreeMap addNewPerson ) throws IOException
    {
       //get user input for new last name, first name, phone, email
@@ -102,24 +139,61 @@ public class ContactList
       addNewPerson.put(newLastName, newPerson);
 
       //create output file object
-      PrintWriter newContactList = new PrintWriter( new BufferedWriter( new FileWriter( readFile, true) ) );
+      PrintWriter newContactList = new PrintWriter( new BufferedWriter( new FileWriter( readFile, false) ) );
       
       Set<Map.Entry<String, String[]>> newList = addNewPerson.entrySet();
       
       for( Map.Entry<String, String[]> printList : newList )
       {
-         newContactList.printf( "%-15s%-17s%-22s%-26s", printList.getKey(), printList.getValue() );
+         //newContactList.printf( "%-15s%-17s%-22s%-26s", printList.getKey(), printList.getValue() );
+         //newContactList.println( printList.getKey() + printList.getValue() );
+         newContactList.println( addNewPerson );
       }
          
+      newContactList.close(); //close output file
 
-      //write to file for storage
    } //end add()
    
-   public void delete( File readFile )
+   /** delete() gets user input for a contact to delete, removes that key and value from the TreeMap
+    * then prints the full TreeMap to a file. 
+    * 
+    * @param input
+    * @param deleteLastName
+    * @param deletePerson
+    * @param newContactList
+    * @param newList
+    * @param printList
+    */
+   public void delete( File readFile, TreeMap deletePerson ) throws IOException
    {
+      Scanner input = new Scanner(System.in);
       
+      System.out.println( "Delete Contact");
+      System.out.print( "\nLast Name: ");
+      String deleteLastName = input.next(); //user input for key
+      
+      deletePerson.remove(deleteLastName); //remove values for selected key
+
+      //create output file object
+      PrintWriter newContactList = new PrintWriter( new BufferedWriter( new FileWriter( readFile, false) ) );
+      
+      Set<Map.Entry<String, String[]>> newList = deletePerson.entrySet();
+      
+      for( Map.Entry<String, String[]> printList : newList )
+      {
+         //newContactList.printf( "%-15s%-17s%-22s%-26s", printList.getKey(), printList.getValue() );
+         newContactList.println( printList.getKey() + printList.getValue() );
+      }
+         
+      newContactList.close(); //close output file
    } //end delete()
    
+   /** display() displays the file contents. 
+    * 
+    * @param readFile
+    * @param displayList
+    * @param record
+    */
    public void display(File readFile) throws IOException
    {
       BufferedReader displayList = null;
@@ -138,28 +212,37 @@ public class ContactList
       }
    } //end display()
    
-
+   /** main() has a switch statement to call the appropriate method based on the user selection. 
+    * 
+    * @param readFile
+    * @param displayList
+    * @param record
+    */
    public static void main(String[] args) throws IOException 
    {
       ContactList list = new ContactList();
 
       File file = new File( list.intro() ); //create new File object
       
-      
       switch( list.userSelection() )
       {
          case 1:
             TreeMap addPerson = list.loadTreeMap( file );
             list.add( file, addPerson );
+            break;
          case 2:
-            list.delete( file );
+            TreeMap deletePerson = list.loadTreeMap( file );
+            list.delete( file, deletePerson );
+            break;
          case 3:
-            list.display( file ); 
-         //default:
-            //System.out.println( "Invalid response.");
+            list.display( file );
+            break;
+         default:
+            System.out.println( "Invalid response.");
       }      
  
       //fileOutput.close();
       
    } //end main()
+   
 } //end ContactList
