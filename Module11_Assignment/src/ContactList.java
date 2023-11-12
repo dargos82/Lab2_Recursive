@@ -19,12 +19,66 @@ import java.util.TreeMap;
  */
 public class ContactList 
 {
-   public enum options
+   public enum Options
    {
       ADD,
       DELETE,
-      DISPLAY
+      DISPLAY,
+      QUIT
    }
+
+   public ContactList() //constructor for ContactList object
+   {
+      this.contactFileName = getFileName();
+      Scanner scanner = new Scanner( this.contactFileName );
+      
+   }
+   
+   /** main() has a switch statement to call the appropriate method based on the user selection. 
+    * 
+    * @param readFile
+    * @param displayList
+    * @param record
+    */
+   public static void main(String[] args) throws IOException 
+   {
+      ContactList list = new ContactList();
+      
+      list.updateContactMap();
+           
+   } //end main()
+   
+   public void updateContactMap() throws IOException
+   {
+      loadContactMap( new File ( getFileName() ) ); //read file and load TreeMap with contact details
+      
+      Options selection = userSelection();
+      
+      while (selection != Options.QUIT)
+      {
+         switch( selection )
+         {
+            case ADD:
+               add();
+               break;
+            case DELETE:
+               delete();
+               break;
+            case DISPLAY:
+               display();
+               break;
+            case QUIT:
+               //list.display( file );
+               break;
+            default:
+               System.out.println( "Invalid response.");
+         }
+      }
+      
+      updateMapFile();  //call to updateMapFile() to write details to file
+      
+   } //end updateContactMap()
+   
    
    /** intro() gets the file path and name from the user. 
     * 
@@ -32,7 +86,7 @@ public class ContactList
     * @return fileName
     * 
     */
-   public String intro()
+   public String getFileName()
    {
       Scanner input = new Scanner(System.in);
       System.out.println( "Welcome to the contact list.");
@@ -47,9 +101,10 @@ public class ContactList
     * @param input
     * @return selection
     */
-   public int userSelection() //user input to add, delete, or display contacts
+   public Options userSelection() //user input to add, delete, or display contacts
    {
       Scanner input = new Scanner(System.in);
+      Options option = Options.QUIT;
       
       System.out.println( "\n1: Add contact" );
       System.out.println( "2: Delete contact" );
@@ -57,7 +112,22 @@ public class ContactList
       System.out.print( "Selection: ");
       int selection = input.nextInt();
       
-      return selection;
+      switch( selection )
+      {
+      case 1:
+         option = Options.ADD;
+      case 2:
+         option = Options.DELETE;
+      case 3:
+         option = Options.DISPLAY;
+      case 4:
+         option = Options.QUIT;
+      }  
+      
+      input.close();
+      
+      return option;
+      
    } //end userSelection()
    
    /** loadTreeMap() reads a file and loads a TreeMap with the last name (key) and details (value). 
@@ -75,16 +145,8 @@ public class ContactList
     * @param strEmail
     * @return person
     */
-   public TreeMap loadTreeMap(File file, Contact contact) throws IOException
+   public void loadContactMap(File file) throws IOException
    {
-      //String[] contactDetails = new String[3];
-      
-      //TreeMap<String, String[]> person = new TreeMap<String, String[]>();
-      
-      //Contact contact = new Contact(firstName, phoneNumber, email);
-      
-      TreeMap<String, Contact> person = new TreeMap<String, Contact>();
-     
       BufferedReader addContact = null;
       String record = null;
       
@@ -104,10 +166,13 @@ public class ContactList
          String strEmail = record.substring(54, 80);
          String email = strEmail.trim();
          
-         person.put(lastName, contact);
+         Contact contact = new Contact(lastName, firstName, phoneNumber, email);
+         
+         this.contactMap.put(lastName, contact);
+         
       } //end while
       
-      return person;
+      addContact.close();
       
    } //end loadTreeMap()
    
@@ -128,36 +193,23 @@ public class ContactList
     * @param newList
     * @param printList
     */
-   public void add( File readFile, TreeMap addNewPerson ) throws IOException
+   public void add()
    {
       //get user input for new last name, first name, phone, email
       Scanner input = new Scanner(System.in);
-      Contact newContact = new Contact(firstName, phoneNumber, email);
       
       System.out.print( "\nLast Name: ");
       String lastName = input.next();
       System.out.print( "\nFirst Name: ");
-      firstName = input.next();
+      String firstName = input.next();
       System.out.print( "\nPhone Number: ");
-      phoneNumber = input.next();
+      String phoneNumber = input.next();
       System.out.print( "\nEmail: ");
-      email = input.next();
+      String email = input.next();
       
-      addNewPerson.put(lastName, newContact);
-
-      //create output file object
-      PrintWriter newContactList = new PrintWriter( new BufferedWriter( new FileWriter( readFile, false) ) );
+      Contact contact = new Contact(lastName, firstName, phoneNumber, email);
       
-      Set<Map.Entry<String, Contact>> newList = addNewPerson.entrySet();
-      
-      for( Map.Entry<String, Contact> printList : newList )
-      {
-         //newContactList.printf( "%-15s%-17s%-22s%-26s", printList.getKey(), printList.getValue() );
-         //newContactList.println( printList.getKey() + printList.getValue() );
-         newContactList.println( addNewPerson );
-      }
-         
-      newContactList.close(); //close output file
+      this.contactMap.put(lastName, contact);
 
    } //end add()
    
@@ -171,44 +223,32 @@ public class ContactList
     * @param newList
     * @param printList
     */
-   public void delete( File readFile, TreeMap deletePerson ) throws IOException
+   public void delete()
    {
       Scanner input = new Scanner(System.in);
       
-      System.out.println( "Delete Contact");
-      System.out.print( "\nLast Name: ");
-      String deleteLastName = input.next(); //user input for key
+      System.out.print( "Last Name of Contact to delete: ");
+      String lastName = input.next(); //user input for key
       
-      deletePerson.remove(deleteLastName); //remove values for selected key
+      this.contactMap.remove(lastName); //remove values for selected key
 
-      //create output file object
-      PrintWriter newContactList = new PrintWriter( new BufferedWriter( new FileWriter( readFile, false) ) );
-      
-      Set<Map.Entry<String, Contact>> newList = deletePerson.entrySet();
-      
-      for( Map.Entry<String, Contact> printList : newList )
-      {
-         //newContactList.printf( "%-15s%-17s%-22s%-26s", printList.getKey(), printList.getValue() );
-         newContactList.println( printList.getKey() + printList.getValue() );
-      }
-         
-      newContactList.close(); //close output file
    } //end delete()
-   
+
    /** display() displays the file contents. 
     * 
     * @param readFile
     * @param displayList
     * @param record
+    * @throws IOException 
     */
-   public void display(File readFile) throws IOException
+   public void display() throws IOException
    {
       BufferedReader displayList = null;
       String record = null;
       
       try
       {
-         displayList = new BufferedReader( new FileReader( readFile ) );
+         displayList = new BufferedReader( new FileReader( this.contactFileName ) );
          
          while( ( record = displayList.readLine() ) !=  null)
             System.out.println( record ); //print data from file
@@ -219,38 +259,33 @@ public class ContactList
       }
    } //end display()
    
-   /** main() has a switch statement to call the appropriate method based on the user selection. 
-    * 
-    * @param readFile
-    * @param displayList
-    * @param record
-    */
-   public static void main(String[] args) throws IOException 
+   public void updateMapFile()
    {
-      ContactList list = new ContactList();
-      Contact contact = new Contact(contact.getFirstName(), contact.getPhoneNumber(), contact.getEmail());
-
-      File file = new File( list.intro() ); //create new File object
-      
-      switch( list.userSelection() )
+      PrintWriter writer;
+      try
       {
-         case 1:
-            TreeMap addPerson = list.loadTreeMap( file, contact );
-            list.add( file, addPerson );
-            break;
-         case 2:
-            TreeMap deletePerson = list.loadTreeMap( file, contact );
-            list.delete( file, deletePerson );
-            break;
-         case 3:
-            list.display( file );
-            break;
-         default:
-            System.out.println( "Invalid response.");
-      }      
- 
-      //fileOutput.close();
-      
-   } //end main()
+         writer = new PrintWriter( new BufferedWriter( new FileWriter( this.contactFileName, false) ) );
+         
+         Set<Map.Entry<String, Contact>> newMap = this.contactMap.entrySet();
+         
+         for( Map.Entry<String, Contact> printMap : newMap )
+         {  
+            writer.printf( "%-15s%-17s%-22s%-26s", printMap.getValue().getLastName(), printMap.getValue().getFirstName(),
+                                    printMap.getValue().getPhoneNumber(), printMap.getValue().getEmail() );
+         }
+            
+         writer.close(); //close output file
+         
+      } catch (IOException e)
+      {
+
+         e.printStackTrace();
+      }
+
+   } //end updateMapFile()
+
+   private Scanner scanner;
+   private TreeMap<String, Contact> contactMap = new TreeMap<String, Contact>();
+   private String contactFileName = null;
    
 } //end ContactList
