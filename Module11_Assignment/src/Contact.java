@@ -8,11 +8,6 @@ public class Contact
       this.email = email;
    }
    
-   Contact()
-   {
-      
-   }
-   
    public String getFirstName()
    {
       return firstName;

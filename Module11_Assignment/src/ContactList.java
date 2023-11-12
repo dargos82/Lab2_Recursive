@@ -61,6 +61,9 @@ public class ContactList
    } //end userSelection()
    
    /** loadTreeMap() reads a file and loads a TreeMap with the last name (key) and details (value). 
+    * @param firstName 
+    * @param phoneNumber 
+    * @param email 
     * 
     * @param contactDetails
     * @param addContact
@@ -72,12 +75,16 @@ public class ContactList
     * @param strEmail
     * @return person
     */
-   public TreeMap loadTreeMap(File file) throws IOException
+   public TreeMap loadTreeMap(File file, Contact contact) throws IOException
    {
-      String[] contactDetails = new String[3];
+      //String[] contactDetails = new String[3];
       
-      TreeMap<String, String[]> person = new TreeMap<String, String[]>();
+      //TreeMap<String, String[]> person = new TreeMap<String, String[]>();
       
+      //Contact contact = new Contact(firstName, phoneNumber, email);
+      
+      TreeMap<String, Contact> person = new TreeMap<String, Contact>();
+     
       BufferedReader addContact = null;
       String record = null;
       
@@ -89,15 +96,15 @@ public class ContactList
          String lastName = strLastName.trim();
          
          String strFirstName = record.substring(16, 33);
-         contactDetails[0] = strFirstName.trim();
+         String firstName = strFirstName.trim();
          
          String strPhoneNum = record.substring(33, 54);
-         contactDetails[1] = strPhoneNum.trim();
+         String phoneNumber = strPhoneNum.trim();
          
          String strEmail = record.substring(54, 80);
-         contactDetails[2] = strEmail.trim();
+         String email = strEmail.trim();
          
-         person.put(lastName, contactDetails);
+         person.put(lastName, contact);
       } //end while
       
       return person;
@@ -114,6 +121,9 @@ public class ContactList
     * @param newPhoneNum
     * @param newEmail
     * @param addNewPerson
+    * @param firstName 
+    * @param phoneNumber 
+    * @param email 
     * @param newContactList
     * @param newList
     * @param printList
@@ -122,28 +132,25 @@ public class ContactList
    {
       //get user input for new last name, first name, phone, email
       Scanner input = new Scanner(System.in);
-      String[] newPerson = new String[3];
+      Contact newContact = new Contact(firstName, phoneNumber, email);
       
       System.out.print( "\nLast Name: ");
-      String newLastName = input.next();
+      String lastName = input.next();
       System.out.print( "\nFirst Name: ");
-      String newFirstName = input.next();
-      newPerson[0] = newFirstName;
+      firstName = input.next();
       System.out.print( "\nPhone Number: ");
-      String newPhoneNum = input.next();
-      newPerson[1] = newPhoneNum;
+      phoneNumber = input.next();
       System.out.print( "\nEmail: ");
-      String newEmail = input.next();
-      newPerson[2] = newEmail;
+      email = input.next();
       
-      addNewPerson.put(newLastName, newPerson);
+      addNewPerson.put(lastName, newContact);
 
       //create output file object
       PrintWriter newContactList = new PrintWriter( new BufferedWriter( new FileWriter( readFile, false) ) );
       
-      Set<Map.Entry<String, String[]>> newList = addNewPerson.entrySet();
+      Set<Map.Entry<String, Contact>> newList = addNewPerson.entrySet();
       
-      for( Map.Entry<String, String[]> printList : newList )
+      for( Map.Entry<String, Contact> printList : newList )
       {
          //newContactList.printf( "%-15s%-17s%-22s%-26s", printList.getKey(), printList.getValue() );
          //newContactList.println( printList.getKey() + printList.getValue() );
@@ -177,9 +184,9 @@ public class ContactList
       //create output file object
       PrintWriter newContactList = new PrintWriter( new BufferedWriter( new FileWriter( readFile, false) ) );
       
-      Set<Map.Entry<String, String[]>> newList = deletePerson.entrySet();
+      Set<Map.Entry<String, Contact>> newList = deletePerson.entrySet();
       
-      for( Map.Entry<String, String[]> printList : newList )
+      for( Map.Entry<String, Contact> printList : newList )
       {
          //newContactList.printf( "%-15s%-17s%-22s%-26s", printList.getKey(), printList.getValue() );
          newContactList.println( printList.getKey() + printList.getValue() );
@@ -221,17 +228,18 @@ public class ContactList
    public static void main(String[] args) throws IOException 
    {
       ContactList list = new ContactList();
+      Contact contact = new Contact(contact.getFirstName(), contact.getPhoneNumber(), contact.getEmail());
 
       File file = new File( list.intro() ); //create new File object
       
       switch( list.userSelection() )
       {
          case 1:
-            TreeMap addPerson = list.loadTreeMap( file );
+            TreeMap addPerson = list.loadTreeMap( file, contact );
             list.add( file, addPerson );
             break;
          case 2:
-            TreeMap deletePerson = list.loadTreeMap( file );
+            TreeMap deletePerson = list.loadTreeMap( file, contact );
             list.delete( file, deletePerson );
             break;
          case 3:
