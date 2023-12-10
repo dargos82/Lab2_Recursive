@@ -1,7 +1,5 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -82,7 +80,6 @@ public class ContactList
    /** getFileName() gets the file path and name from the user. 
     * 
     * @return <String>: 
-    * 
     */
    public String getFileName()
    {
@@ -168,7 +165,6 @@ public class ContactList
    
    /** add() gets user input for new contact details and adds the new contact to
     *  the TreeMap. 
-    * 
     */
    public void add()
    {
@@ -191,7 +187,6 @@ public class ContactList
    
    /** delete() gets user input for a contact to delete, removes that key and value
     *  from the TreeMap.
-    * 
     */
    public void delete()
    {      
