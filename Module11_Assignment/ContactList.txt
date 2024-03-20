@@ -1,5 +1,0 @@
-Blossom        David            (616)123-4567         davidblossom@email.com    
-Cook           James            (901)345-6789         jamescook@email.com       
-Haralampopulos George           (202)846-9001         haralampopulos@email.com  
-John           Hemmingway       (123)456-7891         hemmingway@email.com      
-Shackleton     Ernest           (256)456-7890         ernestshackelton@email.com
